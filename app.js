@@ -1,29 +1,43 @@
 // Requires
 var express = require('express');
 var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
 
 
 //Inicializar variables
 var app = express();
 
+//Body parse
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
+
+//Importar rutas
+var appRoutes = require('./routes/app');
+var usuarioRoutes = require('./routes/usuario');
+var loginRoutes = require('./routes/login');
+
 //Conexion a la base de datos
 // MongoClient.connect("mongodb://localhost:27017/hospitalDB", { useNewUrlParser: true })
 // mongoose.connect("mongodb://localhost:27017/YourDB", { useNewUrlParser: true });
 
-mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', { useNewUrlParser: true, useUnifiedTopology: true }, (err, res) => {
-    if (err) throw err;
-    console.log('Conexion base de datos: \x1b[32m%s\x1b[0m', 'online');
-});
+// mongoose.connect('mongodb://localhost:27017/hospitalDB', (err, res) => {
+//     if (err) throw err;
+//     console.log('Conexion base de datos: \x1b[32m%s\x1b[0m', 'online');
+// });
+
+mongoose.connect('mongodb://localhost:27017/hospitalDB', { useNewUrlParser: true, useUnifiedTopology: true });
+
 // mongoose.connect("mongodb://localhost:27017/YourDB", { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 //Rutas
-app.get('/', (req, res, next) => {
-    res.status(200).json({
-        ok: true,
-        mensaje: 'Peticion realizada correctamente'
-    });
-});
+app.use('/usuario', usuarioRoutes);
+app.use('/login', loginRoutes);
+app.use('/', appRoutes);
 
 //Escuchar petiociones
 app.listen(3000, () => {
